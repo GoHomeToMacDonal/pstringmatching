@@ -1,10 +1,8 @@
 # Paralleled String Similarity Matching Computing Extension
-## Build
+## Install
 ```
-mkdir build
-cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-make
+pip install pybind11
+pip install git+https://github.com/GoHomeToMacDonal/pstringmatching.git
 ```
 
 ## Usage
