@@ -12,6 +12,7 @@
 #include "similarity_measure/bag_distance.hpp"
 #include "similarity_measure/jaro.hpp"
 #include "similarity_measure/jaro_winkler.hpp"
+#include "similarity_measure/levenshtein.hpp"
 
 #include "tokenizer/qgram_tokenizer.hpp"
 #include "tokenizer/whitespace_tokenizer.hpp"
@@ -177,6 +178,10 @@ PYBIND11_MODULE(pstringmatching, m)
     // jaro winkler
     m.def("jaro_winkler", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaro, tokenizer::UnigramTokenizer>>, "jaro winkler");
     m.def("pairwise_jaro_winkler", &compute_pairwise_list_similarity<similarity_measure::Jaro, tokenizer::UnigramTokenizer>, "jaro winkler");
+
+    // levenshtein
+    m.def("levenshtein", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Levenshtein, tokenizer::UnigramTokenizer>>, "levenshtein");
+    m.def("pairwise_levenshtein", &compute_pairwise_list_similarity<similarity_measure::Levenshtein, tokenizer::UnigramTokenizer>, "levenshtein");
 
     // jaccard similarity measures
     m.def("jaccard", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaccard, tokenizer::WhitespaceTokenizer>>, "jaccard similarity measure with whitespace tokenizer");

@@ -30,3 +30,9 @@ def test_jaro(fodors, zagats):
 #     do_test(
 #         fodors, zagats, pstringmatching.pairwise_jaro_winkler, measure=sm.JaroWinkler()
 #     )
+
+
+def test_levenshtein(fodors, zagats):
+    do_test(
+        fodors, zagats, pstringmatching.pairwise_levenshtein, measure=sm.Levenshtein()
+    )
