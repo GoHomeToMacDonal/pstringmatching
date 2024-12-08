@@ -10,6 +10,8 @@ namespace similarity_measure
   template <class token_type>
   struct JaroWinkler
   {
+    using container_type = std::vector<token_type>;
+
     template <class container_type>
     inline float get_raw_score(const container_type &x, const container_type &y, float prefix_weight = 0.1)
     {

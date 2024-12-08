@@ -179,8 +179,8 @@ PYBIND11_MODULE(pstringmatching, m)
     m.def("pairwise_jaro", &compute_pairwise_list_similarity<similarity_measure::Jaro, tokenizer::UnigramTokenizer>, "jaro");
 
     // jaro winkler
-    m.def("jaro_winkler", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaro, tokenizer::UnigramTokenizer>>, "jaro winkler");
-    m.def("pairwise_jaro_winkler", &compute_pairwise_list_similarity<similarity_measure::Jaro, tokenizer::UnigramTokenizer>, "jaro winkler");
+    m.def("jaro_winkler", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::JaroWinkler, tokenizer::UnigramTokenizer>>, "jaro winkler");
+    m.def("pairwise_jaro_winkler", &compute_pairwise_list_similarity<similarity_measure::JaroWinkler, tokenizer::UnigramTokenizer, float>, "jaro winkler");
 
     // levenshtein
     m.def("levenshtein", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Levenshtein, tokenizer::UnigramTokenizer>>, "levenshtein");
