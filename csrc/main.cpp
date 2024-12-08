@@ -10,6 +10,8 @@
 #include "similarity_measure/cosine.hpp"
 #include "similarity_measure/overlap_coefficient.hpp"
 #include "similarity_measure/bag_distance.hpp"
+#include "similarity_measure/jaro.hpp"
+#include "similarity_measure/jaro_winkler.hpp"
 
 #include "tokenizer/qgram_tokenizer.hpp"
 #include "tokenizer/whitespace_tokenizer.hpp"
@@ -167,6 +169,14 @@ PYBIND11_MODULE(pstringmatching, m)
     // bag distance
     m.def("bag_distance", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::BagDistance, tokenizer::TokenCounter>>, "bag distance");
     m.def("pairwise_bag_distance", &compute_pairwise_list_similarity<similarity_measure::BagDistance, tokenizer::TokenCounter>, "bag distance");
+
+    // jaro
+    m.def("jaro", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaro, tokenizer::UnigramTokenizer>>, "jaro");
+    m.def("pairwise_jaro", &compute_pairwise_list_similarity<similarity_measure::Jaro, tokenizer::UnigramTokenizer>, "jaro");
+
+    // jaro winkler
+    m.def("jaro_winkler", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaro, tokenizer::UnigramTokenizer>>, "jaro winkler");
+    m.def("pairwise_jaro_winkler", &compute_pairwise_list_similarity<similarity_measure::Jaro, tokenizer::UnigramTokenizer>, "jaro winkler");
 
     // jaccard similarity measures
     m.def("jaccard", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaccard, tokenizer::WhitespaceTokenizer>>, "jaccard similarity measure with whitespace tokenizer");

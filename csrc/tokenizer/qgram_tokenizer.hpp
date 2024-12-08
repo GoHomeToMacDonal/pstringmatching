@@ -68,6 +68,22 @@ namespace tokenizer
       return true;
     }
   };
+
+  template <typename char_type>
+  class UnigramTokenizer
+  {
+  public:
+    using token_type = int;
+    template <class input_type, class container_type>
+    inline bool operator()(const input_type *begin, container_type &grams)
+    {
+      for (; *begin != 0; ++begin)
+      {
+        grams.push_back((token_type)*begin);
+      }
+      return true;
+    }
+  };
 }
 
 #endif

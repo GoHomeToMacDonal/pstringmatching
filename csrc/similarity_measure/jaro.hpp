@@ -5,12 +5,19 @@
 
 #include <vector>
 
-namespace similarity_measure {
-  namespace jaro {
-    template<class container_type>
-    inline float get_raw_score(const container_type & x, const container_type & y) {
+namespace similarity_measure
+{
+  template <class token_type>
+  struct Jaro
+  {
+    using container_type = std::vector<token_type>;
+
+    template <class container_type>
+    inline float get_raw_score(const container_type &x, const container_type &y)
+    {
       auto lx = x.size(), ly = y.size();
-      if (lx == 0 || ly == 0) {
+      if (lx == 0 || ly == 0)
+      {
         return 0.0f;
       }
 
@@ -21,34 +28,43 @@ namespace similarity_measure {
 
       std::size_t common_chars = 0, low = 0, high = 0, i = 0, j = 0;
       // Finding the number of common characters in two strings
-      for (i = 0; i < lx; i++) {
+      for (i = 0; i < lx; i++)
+      {
         low = i > search_range ? i - search_range : 0;
         high = i + search_range < ly ? i + search_range : ly - 1;
-        for (j = low; j <= high; j++) {
-          if (flags_s2[j] == 0 && y[j] == x[i]) {
-              flags_s1[i] = flags_s2[j] = 1;
-              common_chars += 1;
-              break;
+        for (j = low; j <= high; j++)
+        {
+          if (flags_s2[j] == 0 && y[j] == x[i])
+          {
+            flags_s1[i] = flags_s2[j] = 1;
+            common_chars += 1;
+            break;
           }
         }
       }
 
-      if (common_chars == 0) {
+      if (common_chars == 0)
+      {
         return 0.0f;
       }
 
       std::size_t trans_count = 0, k = 0;
 
       // Finding the number of transpositions and Jaro distance
-      for (i = 0; i < lx; i++) {
-        if (flags_s1[i] == 1) {
-          for (j = k; j < ly; j++) {
-            if (flags_s2[j] == 1) {
+      for (i = 0; i < lx; i++)
+      {
+        if (flags_s1[i] == 1)
+        {
+          for (j = k; j < ly; j++)
+          {
+            if (flags_s2[j] == 1)
+            {
               k = j + 1;
               break;
             }
           }
-          if (x[i] != y[j]) {
+          if (x[i] != y[j])
+          {
             trans_count += 1;
           }
         }
@@ -61,11 +77,12 @@ namespace similarity_measure {
       return (ccs / lx + ccs / ly + (ccs - trans_count) / ccs) / 3;
     }
 
-    template<class container_type>
-    inline float get_sim_score(const container_type & x, const container_type & y) {
+    template <class container_type>
+    inline float get_sim_score(const container_type &x, const container_type &y)
+    {
       return get_raw_score<container_type>(x, y);
     }
-  }
+  };
 }
 
 #endif
