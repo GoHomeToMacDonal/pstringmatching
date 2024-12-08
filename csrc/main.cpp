@@ -15,6 +15,7 @@
 #include "similarity_measure/levenshtein.hpp"
 #include "similarity_measure/needleman_wunsch.hpp"
 #include "similarity_measure/smith_waterman.hpp"
+#include "similarity_measure/tversky_index.hpp"
 
 #include "tokenizer/qgram_tokenizer.hpp"
 #include "tokenizer/whitespace_tokenizer.hpp"
@@ -103,8 +104,8 @@ py::array_t<double> compute_list_similarity(py::list a, py::list b)
     return result;
 }
 
-template <template <class> class Measure, template <typename> class Tokenizer>
-py::array_t<double> compute_pairwise_list_similarity(py::list X, py::list Y)
+template <template <class> class Measure, template <typename> class Tokenizer, class ...Args>
+py::array_t<double> compute_pairwise_list_similarity(py::list X, py::list Y, Args... args)
 {
     using container_type = typename Measure<typename Tokenizer<int>::token_type>::container_type;
     Tokenizer<int> tokenizer;
@@ -158,7 +159,7 @@ py::array_t<double> compute_pairwise_list_similarity(py::list X, py::list Y)
     {
         for (int j = 0; j < N; j++)
         {
-            sims[i * N + j] = measure.get_sim_score(_X[i], _Y[j]);
+            sims[i * N + j] = measure.get_sim_score(_X[i], _Y[j], args...);
         }
     }
 
@@ -260,4 +261,21 @@ PYBIND11_MODULE(pstringmatching, m)
     m.def("pairwise_unigram_overlap_coefficient", &compute_pairwise_list_similarity<similarity_measure::OverlapCoefficient, QgramTokenizer1>, "unigram overlap coefficient similarity measure");
     m.def("pairwise_bigram_overlap_coefficient", &compute_pairwise_list_similarity<similarity_measure::OverlapCoefficient, QgramTokenizer2>, "unigram overlap coefficient similarity measure");
     m.def("pairwise_trigram_overlap_coefficient", &compute_pairwise_list_similarity<similarity_measure::OverlapCoefficient, QgramTokenizer3>, "unigram overlap coefficient similarity measure");
+    
+    // tversky index similarity measures
+    // m.def("tversky_index", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::TverskyIndex, tokenizer::WhitespaceTokenizer>>, "tversky index similarity measure with whitespace tokenizer");
+    // m.def("alphabetic_tversky_index", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::TverskyIndex, tokenizer::AlphabeticTokenizer>>, "tversky index similarity measure with alphabetic tokenizer");
+    // m.def("alphanumeric_tversky_index", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::TverskyIndex, tokenizer::AlphanumericTokenizer>>, "tversky index similarity measure with alphanumeric tokenizer");
+
+    // m.def("unigram_tversky_index", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::TverskyIndex, QgramTokenizer1>>, "unigram tversky index similarity measure");
+    // m.def("bigram_tversky_index", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::TverskyIndex, QgramTokenizer2>>, "bigram tversky index similarity measure");
+    // m.def("trigram_tversky_index", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::TverskyIndex, QgramTokenizer3>>, "trigram tversky index similarity measures");
+
+    m.def("pairwise_tversky_index", &compute_pairwise_list_similarity<similarity_measure::TverskyIndex, tokenizer::WhitespaceTokenizer, float, float>, "tversky index similarity measure with whitespace tokenizer");
+    m.def("pairwise_alphabetic_tversky_index", &compute_pairwise_list_similarity<similarity_measure::TverskyIndex, tokenizer::AlphabeticTokenizer, float, float>, "tversky index similarity measure with alphabetic tokenizer");
+    m.def("pairwise_alphanumeric_tversky_index", &compute_pairwise_list_similarity<similarity_measure::TverskyIndex, tokenizer::AlphanumericTokenizer, float, float>, "tversky index similarity measure with alphanumeric tokenizer");
+
+    m.def("pairwise_unigram_tversky_index", &compute_pairwise_list_similarity<similarity_measure::TverskyIndex, QgramTokenizer1, float, float>, "unigram tversky index similarity measure");
+    m.def("pairwise_bigram_tversky_index", &compute_pairwise_list_similarity<similarity_measure::TverskyIndex, QgramTokenizer2, float, float>, "unigram tversky index similarity measure");
+    m.def("pairwise_trigram_tversky_index", &compute_pairwise_list_similarity<similarity_measure::TverskyIndex, QgramTokenizer3, float, float>, "unigram tversky index similarity measure");
 }
