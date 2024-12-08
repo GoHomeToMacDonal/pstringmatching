@@ -20,9 +20,10 @@ namespace similarity_measure {
 
       __pstringmatching_impl::counter_iterator< container_type > i, u;
       i = std::set_intersection(std::begin(x), std::end(x), std::begin(y), std::end(y), i);
-      u = std::set_union(std::begin(x), std::end(x), std::begin(y), std::end(y), u);
+      // u = std::set_union(std::begin(x), std::end(x), std::begin(y), std::end(y), u);
+      auto i_cnt = i.count();
 
-      return i.count() * 1.0 / u.count();
+      return i_cnt * 1.0 / (x.size() + y.size() - i_cnt);
     }
 
     template<class _container_type>

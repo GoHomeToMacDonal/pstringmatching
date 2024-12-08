@@ -24,8 +24,9 @@ namespace tokenizer {
       for (auto i = c; *i != 0; ++i) {
         if (!is_whitespace(*i)) {
           auto s = i;
-          while (*i != 0 && !is_whitespace(*i)) ++i;
+          while ((*i != 0) && !is_whitespace(*i)) ++i;;
           grams.insert(container_token_type{s, i});
+          if (*i == 0) break;
         }
       }
 

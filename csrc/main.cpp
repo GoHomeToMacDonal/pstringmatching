@@ -8,6 +8,8 @@
 #include "similarity_measure/jaccard.hpp"
 #include "tokenizer/qgram_tokenizer.hpp"
 #include "tokenizer/whitespace_tokenizer.hpp"
+#include "tokenizer/alphabetic_tokenizer.hpp"
+#include "tokenizer/alphanumeric_tokenizer.hpp"
 
 namespace py = pybind11;
 
@@ -109,13 +111,33 @@ py::array_t<double> compute_pairwise_list_similarity(py::list X, py::list Y)
     #pragma omp parallel for
     for (int i = 0; i < M; i++)
     {
-        tokenizer(PyUnicode_4BYTE_DATA(x_ptr[i]), _X[i]);
+        switch (PyUnicode_KIND(x_ptr[i])) {
+        case 1:
+            tokenizer(PyUnicode_1BYTE_DATA(x_ptr[i]), _X[i]);
+            break;
+        case 2:
+            tokenizer(PyUnicode_2BYTE_DATA(x_ptr[i]), _X[i]);
+            break;
+        case 4:
+            tokenizer(PyUnicode_4BYTE_DATA(x_ptr[i]), _X[i]);
+            break;
+        }
     }
 
     #pragma omp parallel for
     for (int j = 0; j < N; j++)
     {
-        tokenizer(PyUnicode_4BYTE_DATA(y_ptr[j]), _Y[j]);
+        switch (PyUnicode_KIND(y_ptr[j])) {
+        case 1:
+            tokenizer(PyUnicode_1BYTE_DATA(y_ptr[j]), _Y[j]);
+            break;
+        case 2:
+            tokenizer(PyUnicode_2BYTE_DATA(y_ptr[j]), _Y[j]);
+            break;
+        case 4:
+            tokenizer(PyUnicode_4BYTE_DATA(y_ptr[j]), _Y[j]);
+            break;
+        }
     }
 
     #pragma omp parallel for
@@ -134,12 +156,18 @@ PYBIND11_MODULE(pstringmatching, m)
 {
     m.doc() = "Similarity measures"; // optional module docstring
 
-    m.def("jaccard", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaccard, tokenizer::WhitespaceTokenizer>>, "unigram jaccard similarity measure");
+    m.def("jaccard", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaccard, tokenizer::WhitespaceTokenizer>>, "jaccard similarity measure with whitespace tokenizer");
+    m.def("alphabetic_jaccard", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaccard, tokenizer::AlphabeticTokenizer>>, "jaccard similarity measure with alphabetic tokenizer");
+    m.def("alphanumeric_jaccard", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaccard, tokenizer::AlphanumericTokenizer>>, "jaccard similarity measure with alphanumeric tokenizer");
+
     m.def("unigram_jaccard", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaccard, QgramTokenizer1>>, "unigram jaccard similarity measure");
     m.def("bigram_jaccard", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaccard, QgramTokenizer2>>, "bigram jaccard similarity measure");
     m.def("trigram_jaccard", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaccard, QgramTokenizer3>>, "trigram jaccard similarity measures");
 
-    m.def("pairwise_jaccard", &compute_pairwise_list_similarity<similarity_measure::Jaccard, tokenizer::WhitespaceTokenizer>, "unigram jaccard similarity measure");
+    m.def("pairwise_jaccard", &compute_pairwise_list_similarity<similarity_measure::Jaccard, tokenizer::WhitespaceTokenizer>, "jaccard similarity measure with whitespace tokenizer");
+    m.def("pairwise_alphabetic_jaccard", &compute_pairwise_list_similarity<similarity_measure::Jaccard, tokenizer::AlphabeticTokenizer>, "jaccard similarity measure with alphabetic tokenizer");
+    m.def("pairwise_alphanumeric_jaccard", &compute_pairwise_list_similarity<similarity_measure::Jaccard, tokenizer::AlphanumericTokenizer>, "jaccard similarity measure with alphanumeric tokenizer");
+
     m.def("pairwise_unigram_jaccard", &compute_pairwise_list_similarity<similarity_measure::Jaccard, QgramTokenizer1>, "unigram jaccard similarity measure");
     m.def("pairwise_bigram_jaccard", &compute_pairwise_list_similarity<similarity_measure::Jaccard, QgramTokenizer2>, "unigram jaccard similarity measure");
     m.def("pairwise_trigram_jaccard", &compute_pairwise_list_similarity<similarity_measure::Jaccard, QgramTokenizer3>, "unigram jaccard similarity measure");
