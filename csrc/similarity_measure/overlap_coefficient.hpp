@@ -1,17 +1,17 @@
-#ifndef REMP_EXT_SIMILARITY_MEASURE_COSINE_HPP
-#define REMP_EXT_SIMILARITY_MEASURE_COSINE_HPP
+#ifndef PSTRINGMATCHING_SIMILARITY_MEASURE_OVERLAP_COEFFICIENT_HPP
+#define PSTRINGMATCHING_SIMILARITY_MEASURE_OVERLAP_COEFFICIENT_HPP
 
 #pragma once
 
 #include <algorithm>
 #include <set>
-#include <cmath>
+#include <utility>
 #include "../util/counter_iterator.hpp"
 
 namespace similarity_measure
 {
   template <class token_type>
-  struct Cosine
+  struct OverlapCoefficient
   {
     using container_type = std::set<token_type>;
 
@@ -28,7 +28,7 @@ namespace similarity_measure
 
       auto i_cnt = i.count();
 
-      return i_cnt * 1.0 / (std::sqrt(x.size()) * std::sqrt(y.size()));
+      return i_cnt * 1.0 / std::min(x.size(), y.size());
     }
 
     template <class _container_type>

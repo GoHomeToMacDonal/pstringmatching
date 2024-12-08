@@ -10,23 +10,23 @@ def test_fodors_zagats(fodors, zagats):
     y = [z["name"] for z in zagats]
 
     metadata = [
-        (sm.QgramTokenizer(qval=1).tokenize, pstringmatching.pairwise_unigram_jaccard),
-        (sm.QgramTokenizer(qval=2).tokenize, pstringmatching.pairwise_bigram_jaccard),
-        (sm.QgramTokenizer(qval=3).tokenize, pstringmatching.pairwise_trigram_jaccard),
-        (sm.WhitespaceTokenizer().tokenize, pstringmatching.pairwise_jaccard),
+        (sm.QgramTokenizer(qval=1).tokenize, pstringmatching.pairwise_unigram_cosine),
+        (sm.QgramTokenizer(qval=2).tokenize, pstringmatching.pairwise_bigram_cosine),
+        (sm.QgramTokenizer(qval=3).tokenize, pstringmatching.pairwise_trigram_cosine),
+        (sm.WhitespaceTokenizer().tokenize, pstringmatching.pairwise_cosine),
         (
             sm.AlphabeticTokenizer().tokenize,
-            pstringmatching.pairwise_alphabetic_jaccard,
+            pstringmatching.pairwise_alphabetic_cosine,
         ),
         (
             sm.AlphanumericTokenizer().tokenize,
-            pstringmatching.pairwise_alphanumeric_jaccard,
+            pstringmatching.pairwise_alphanumeric_cosine,
         ),
     ]
 
     for tokenize, func in metadata:
         sim = func(x, y)
-        measure = sm.Jaccard()
+        measure = sm.Cosine()
 
         for i, xi in enumerate(x):
             for j, yj in enumerate(y):

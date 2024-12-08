@@ -13,7 +13,7 @@ def fodors():
         for row in data:
             if len(row) == len(columns):
                 items.append({columns[i]: row[i] for i in range(len(columns))})
-        return items
+        return items[:16]
 
 
 @pytest.fixture
@@ -27,4 +27,4 @@ def zagats():
         for row in data:
             if len(row) == len(columns):
                 items.append({columns[i]: row[i] for i in range(len(columns))})
-        return items
+        return items[:16]

@@ -6,6 +6,10 @@
 #include <pybind11/numpy.h>
 
 #include "similarity_measure/jaccard.hpp"
+#include "similarity_measure/dice.hpp"
+#include "similarity_measure/cosine.hpp"
+#include "similarity_measure/overlap_coefficient.hpp"
+
 #include "tokenizer/qgram_tokenizer.hpp"
 #include "tokenizer/whitespace_tokenizer.hpp"
 #include "tokenizer/alphabetic_tokenizer.hpp"
@@ -108,10 +112,11 @@ py::array_t<double> compute_pairwise_list_similarity(py::list X, py::list Y)
     PyObject **x_ptr = ((PyListObject *)X.ptr())->ob_item;
     PyObject **y_ptr = ((PyListObject *)Y.ptr())->ob_item;
 
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int i = 0; i < M; i++)
     {
-        switch (PyUnicode_KIND(x_ptr[i])) {
+        switch (PyUnicode_KIND(x_ptr[i]))
+        {
         case 1:
             tokenizer(PyUnicode_1BYTE_DATA(x_ptr[i]), _X[i]);
             break;
@@ -124,10 +129,11 @@ py::array_t<double> compute_pairwise_list_similarity(py::list X, py::list Y)
         }
     }
 
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int j = 0; j < N; j++)
     {
-        switch (PyUnicode_KIND(y_ptr[j])) {
+        switch (PyUnicode_KIND(y_ptr[j]))
+        {
         case 1:
             tokenizer(PyUnicode_1BYTE_DATA(y_ptr[j]), _Y[j]);
             break;
@@ -140,7 +146,7 @@ py::array_t<double> compute_pairwise_list_similarity(py::list X, py::list Y)
         }
     }
 
-    #pragma omp parallel for
+#pragma omp parallel for
     for (int i = 0; i < M; i++)
     {
         for (int j = 0; j < N; j++)
@@ -156,6 +162,7 @@ PYBIND11_MODULE(pstringmatching, m)
 {
     m.doc() = "Similarity measures"; // optional module docstring
 
+    // jaccard similarity measures
     m.def("jaccard", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaccard, tokenizer::WhitespaceTokenizer>>, "jaccard similarity measure with whitespace tokenizer");
     m.def("alphabetic_jaccard", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaccard, tokenizer::AlphabeticTokenizer>>, "jaccard similarity measure with alphabetic tokenizer");
     m.def("alphanumeric_jaccard", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaccard, tokenizer::AlphanumericTokenizer>>, "jaccard similarity measure with alphanumeric tokenizer");
@@ -171,4 +178,55 @@ PYBIND11_MODULE(pstringmatching, m)
     m.def("pairwise_unigram_jaccard", &compute_pairwise_list_similarity<similarity_measure::Jaccard, QgramTokenizer1>, "unigram jaccard similarity measure");
     m.def("pairwise_bigram_jaccard", &compute_pairwise_list_similarity<similarity_measure::Jaccard, QgramTokenizer2>, "unigram jaccard similarity measure");
     m.def("pairwise_trigram_jaccard", &compute_pairwise_list_similarity<similarity_measure::Jaccard, QgramTokenizer3>, "unigram jaccard similarity measure");
+
+    // dice similarity measures
+    m.def("dice", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Dice, tokenizer::WhitespaceTokenizer>>, "dice similarity measure with whitespace tokenizer");
+    m.def("alphabetic_dice", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Dice, tokenizer::AlphabeticTokenizer>>, "dice similarity measure with alphabetic tokenizer");
+    m.def("alphanumeric_dice", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Dice, tokenizer::AlphanumericTokenizer>>, "dice similarity measure with alphanumeric tokenizer");
+
+    m.def("unigram_dice", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Dice, QgramTokenizer1>>, "unigram dice similarity measure");
+    m.def("bigram_dice", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Dice, QgramTokenizer2>>, "bigram dice similarity measure");
+    m.def("trigram_dice", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Dice, QgramTokenizer3>>, "trigram dice similarity measures");
+
+    m.def("pairwise_dice", &compute_pairwise_list_similarity<similarity_measure::Dice, tokenizer::WhitespaceTokenizer>, "dice similarity measure with whitespace tokenizer");
+    m.def("pairwise_alphabetic_dice", &compute_pairwise_list_similarity<similarity_measure::Dice, tokenizer::AlphabeticTokenizer>, "dice similarity measure with alphabetic tokenizer");
+    m.def("pairwise_alphanumeric_dice", &compute_pairwise_list_similarity<similarity_measure::Dice, tokenizer::AlphanumericTokenizer>, "dice similarity measure with alphanumeric tokenizer");
+
+    m.def("pairwise_unigram_dice", &compute_pairwise_list_similarity<similarity_measure::Dice, QgramTokenizer1>, "unigram dice similarity measure");
+    m.def("pairwise_bigram_dice", &compute_pairwise_list_similarity<similarity_measure::Dice, QgramTokenizer2>, "unigram dice similarity measure");
+    m.def("pairwise_trigram_dice", &compute_pairwise_list_similarity<similarity_measure::Dice, QgramTokenizer3>, "unigram dice similarity measure");
+    
+    // cosine similarity measures
+    m.def("cosine", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Cosine, tokenizer::WhitespaceTokenizer>>, "cosine similarity measure with whitespace tokenizer");
+    m.def("alphabetic_cosine", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Cosine, tokenizer::AlphabeticTokenizer>>, "cosine similarity measure with alphabetic tokenizer");
+    m.def("alphanumeric_cosine", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Cosine, tokenizer::AlphanumericTokenizer>>, "cosine similarity measure with alphanumeric tokenizer");
+
+    m.def("unigram_cosine", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Cosine, QgramTokenizer1>>, "unigram cosine similarity measure");
+    m.def("bigram_cosine", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Cosine, QgramTokenizer2>>, "bigram cosine similarity measure");
+    m.def("trigram_cosine", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Cosine, QgramTokenizer3>>, "trigram cosine similarity measures");
+
+    m.def("pairwise_cosine", &compute_pairwise_list_similarity<similarity_measure::Cosine, tokenizer::WhitespaceTokenizer>, "cosine similarity measure with whitespace tokenizer");
+    m.def("pairwise_alphabetic_cosine", &compute_pairwise_list_similarity<similarity_measure::Cosine, tokenizer::AlphabeticTokenizer>, "cosine similarity measure with alphabetic tokenizer");
+    m.def("pairwise_alphanumeric_cosine", &compute_pairwise_list_similarity<similarity_measure::Cosine, tokenizer::AlphanumericTokenizer>, "cosine similarity measure with alphanumeric tokenizer");
+
+    m.def("pairwise_unigram_cosine", &compute_pairwise_list_similarity<similarity_measure::Cosine, QgramTokenizer1>, "unigram cosine similarity measure");
+    m.def("pairwise_bigram_cosine", &compute_pairwise_list_similarity<similarity_measure::Cosine, QgramTokenizer2>, "unigram cosine similarity measure");
+    m.def("pairwise_trigram_cosine", &compute_pairwise_list_similarity<similarity_measure::Cosine, QgramTokenizer3>, "unigram cosine similarity measure");
+
+    // overlap coefficient similarity measures
+    m.def("overlap_coefficient", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::OverlapCoefficient, tokenizer::WhitespaceTokenizer>>, "overlap_coefficient similarity measure with whitespace tokenizer");
+    m.def("alphabetic_overlap_coefficient", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::OverlapCoefficient, tokenizer::AlphabeticTokenizer>>, "overlap_coefficient similarity measure with alphabetic tokenizer");
+    m.def("alphanumeric_overlap_coefficient", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::OverlapCoefficient, tokenizer::AlphanumericTokenizer>>, "overlap_coefficient similarity measure with alphanumeric tokenizer");
+
+    m.def("unigram_overlap_coefficient", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::OverlapCoefficient, QgramTokenizer1>>, "unigram overlap coefficient similarity measure");
+    m.def("bigram_overlap_coefficient", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::OverlapCoefficient, QgramTokenizer2>>, "bigram overlap coefficient similarity measure");
+    m.def("trigram_overlap_coefficient", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::OverlapCoefficient, QgramTokenizer3>>, "trigram overlap coefficient similarity measures");
+
+    m.def("pairwise_overlap_coefficient", &compute_pairwise_list_similarity<similarity_measure::OverlapCoefficient, tokenizer::WhitespaceTokenizer>, "overlap_coefficient similarity measure with whitespace tokenizer");
+    m.def("pairwise_alphabetic_overlap_coefficient", &compute_pairwise_list_similarity<similarity_measure::OverlapCoefficient, tokenizer::AlphabeticTokenizer>, "overlap_coefficient similarity measure with alphabetic tokenizer");
+    m.def("pairwise_alphanumeric_overlap_coefficient", &compute_pairwise_list_similarity<similarity_measure::OverlapCoefficient, tokenizer::AlphanumericTokenizer>, "overlap_coefficient similarity measure with alphanumeric tokenizer");
+
+    m.def("pairwise_unigram_overlap_coefficient", &compute_pairwise_list_similarity<similarity_measure::OverlapCoefficient, QgramTokenizer1>, "unigram overlap coefficient similarity measure");
+    m.def("pairwise_bigram_overlap_coefficient", &compute_pairwise_list_similarity<similarity_measure::OverlapCoefficient, QgramTokenizer2>, "unigram overlap coefficient similarity measure");
+    m.def("pairwise_trigram_overlap_coefficient", &compute_pairwise_list_similarity<similarity_measure::OverlapCoefficient, QgramTokenizer3>, "unigram overlap coefficient similarity measure");
 }
