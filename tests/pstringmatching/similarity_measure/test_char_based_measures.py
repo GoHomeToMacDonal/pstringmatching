@@ -22,9 +22,8 @@ def test_bag_distance(fodors, zagats):
 
 
 def test_jaro(fodors, zagats):
-    do_test(
-        fodors, zagats, pstringmatching.pairwise_jaro, measure=sm.Jaro()
-    )
+    do_test(fodors, zagats, pstringmatching.pairwise_jaro, measure=sm.Jaro())
+
 
 # def test_jaro_winkler(fodors, zagats):
 #     do_test(
@@ -36,3 +35,25 @@ def test_levenshtein(fodors, zagats):
     do_test(
         fodors, zagats, pstringmatching.pairwise_levenshtein, measure=sm.Levenshtein()
     )
+
+
+def test_pairwise_needleman_wunsch(fodors, zagats):
+    x = [f["name"] for f in fodors]
+    y = [z["name"] for z in zagats]
+
+    sim = pstringmatching.pairwise_needleman_wunsch(x, y)
+    measure = sm.NeedlemanWunsch()
+    for i, xi in enumerate(x):
+        for j, yj in enumerate(y):
+            assert math.fabs(sim[i, j] - measure.get_raw_score(xi, yj)) <= 1e-5
+
+
+def test_pairwise_smith_waterman(fodors, zagats):
+    x = [f["name"] for f in fodors]
+    y = [z["name"] for z in zagats]
+
+    sim = pstringmatching.pairwise_smith_waterman(x, y)
+    measure = sm.SmithWaterman()
+    for i, xi in enumerate(x):
+        for j, yj in enumerate(y):
+            assert math.fabs(sim[i, j] - measure.get_raw_score(xi, yj)) <= 1e-5

@@ -13,6 +13,8 @@
 #include "similarity_measure/jaro.hpp"
 #include "similarity_measure/jaro_winkler.hpp"
 #include "similarity_measure/levenshtein.hpp"
+#include "similarity_measure/needleman_wunsch.hpp"
+#include "similarity_measure/smith_waterman.hpp"
 
 #include "tokenizer/qgram_tokenizer.hpp"
 #include "tokenizer/whitespace_tokenizer.hpp"
@@ -182,6 +184,14 @@ PYBIND11_MODULE(pstringmatching, m)
     // levenshtein
     m.def("levenshtein", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Levenshtein, tokenizer::UnigramTokenizer>>, "levenshtein");
     m.def("pairwise_levenshtein", &compute_pairwise_list_similarity<similarity_measure::Levenshtein, tokenizer::UnigramTokenizer>, "levenshtein");
+
+    // needleman wunsch
+    m.def("needleman_wunsch", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::NeedlemanWunsch, tokenizer::UnigramTokenizer>>, "needleman wunsch");
+    m.def("pairwise_needleman_wunsch", &compute_pairwise_list_similarity<similarity_measure::NeedlemanWunsch, tokenizer::UnigramTokenizer>, "needleman wunsch");
+
+    // needleman wunsch
+    m.def("smith_waterman", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::SmithWaterman, tokenizer::UnigramTokenizer>>, "smith waterman");
+    m.def("pairwise_smith_waterman", &compute_pairwise_list_similarity<similarity_measure::SmithWaterman, tokenizer::UnigramTokenizer>, "smith waterman");
 
     // jaccard similarity measures
     m.def("jaccard", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaccard, tokenizer::WhitespaceTokenizer>>, "jaccard similarity measure with whitespace tokenizer");
