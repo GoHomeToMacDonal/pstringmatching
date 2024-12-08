@@ -11,4 +11,4 @@ ext_modules = [
     ),
 ]
 
-setup(ext_modules=ext_modules)
+setup(name="pstringmatching", ext_modules=ext_modules)
