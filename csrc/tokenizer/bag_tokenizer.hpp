@@ -1,5 +1,5 @@
-#ifndef REMP_EXT_TOKENIZER_QGRAM_TOKENIZER_HPP
-#define REMP_EXT_TOKENIZER_QGRAM_TOKENIZER_HPP
+#ifndef REMP_EXT_TOKENIZER_BAG_TOKENIZER_HPP
+#define REMP_EXT_TOKENIZER_BAG_TOKENIZER_HPP
 
 #pragma once
 
@@ -9,12 +9,12 @@
 
 namespace tokenizer
 {
-
-  template <int qval, typename char_type>
-  class QgramTokenizer
+  template <typename char_type>
+  class BagTokenizer
   {
   public:
-    using token_type = typename std::array<wchar_t, qval>;
+    using token_type = char_type;
+
     template <class input_type, class container_type>
     inline bool operator()(const input_type *begin, container_type &grams)
     {

@@ -9,11 +9,13 @@
 #include "similarity_measure/dice.hpp"
 #include "similarity_measure/cosine.hpp"
 #include "similarity_measure/overlap_coefficient.hpp"
+#include "similarity_measure/bag_distance.hpp"
 
 #include "tokenizer/qgram_tokenizer.hpp"
 #include "tokenizer/whitespace_tokenizer.hpp"
 #include "tokenizer/alphabetic_tokenizer.hpp"
 #include "tokenizer/alphanumeric_tokenizer.hpp"
+#include "tokenizer/token_counter.hpp"
 
 namespace py = pybind11;
 
@@ -161,6 +163,10 @@ py::array_t<double> compute_pairwise_list_similarity(py::list X, py::list Y)
 PYBIND11_MODULE(pstringmatching, m)
 {
     m.doc() = "Similarity measures"; // optional module docstring
+
+    // bag distance
+    m.def("bag_distance", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::BagDistance, tokenizer::TokenCounter>>, "bag distance");
+    m.def("pairwise_bag_distance", &compute_pairwise_list_similarity<similarity_measure::BagDistance, tokenizer::TokenCounter>, "bag distance");
 
     // jaccard similarity measures
     m.def("jaccard", &compute_list_similarity<PyOjbectSimilarityFunction<similarity_measure::Jaccard, tokenizer::WhitespaceTokenizer>>, "jaccard similarity measure with whitespace tokenizer");
